@@ -43,7 +43,7 @@
 | 날짜 |차시|강사| 강의자료 |
 |---|---|---|---|
 | [Day1]  2026.05.09 |1차시|염시진|인공지능과 함수 
-| |2차시|박해룡|[파이썬 실습](./PYMAIA5_day1_파이썬_실습.ipynb),[선형회귀 실습](./PYMAIA5_day1_선형회귀_실습.ipynb)|
+| |2차시|박해룡|[파이썬 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%ED%8C%8C%EC%9D%B4%EC%8D%AC_%EC%8B%A4%EC%8A%B5.ipynb),[선형회귀 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80%2C%EB%A1%9C%EC%A7%80%EC%8A%A4%ED%8B%B1%ED%9A%8C%EA%B7%80_ipynb%EC%9D%98_%EC%82%AC%EB%B3%B8.ipynb)|
 | [Day2] 2026.05.16  |1차시|||
 |   |2차시|||
 | [Day3] 2026.05.23 |1차시||| 
