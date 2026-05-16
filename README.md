@@ -1,5 +1,5 @@
 # 6회 포스텍청소년수리인공지능아카데미(2반)
-<img width="422" height="596" alt="image" src="https://github.com/user-attachments/assets/78f28219-2814-4b2e-b359-6d9877fdae8b" />
+<img width="422" height="596" alt="image" src="poster_6th.png" />
 
 
 ## 강의 개요
