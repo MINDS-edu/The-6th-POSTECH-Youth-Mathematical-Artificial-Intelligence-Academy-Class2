@@ -42,9 +42,9 @@
 
 | 날짜 |차시|강사| 강의 내용 |강의 자료|
 |---|---|---|---|---|
-| [Day1]  2026.05.09 |1차시|염시진|인공지능과 함수 
-| |2차시|박해룡|선형회귀 실습|[파이썬 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%ED%8C%8C%EC%9D%B4%EC%8D%AC_%EC%8B%A4%EC%8A%B5.ipynb),[선형회귀 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80%2C%EB%A1%9C%EC%A7%80%EC%8A%A4%ED%8B%B1%ED%9A%8C%EA%B7%80_ipynb%EC%9D%98_%EC%82%AC%EB%B3%B8.ipynb)|
-| [Day2] 2026.05.16  |1차시|임재형|인공지능 기초수학|
+| [Day1]  2026.05.09 |1차시|염시진|인공지능과 함수|[6기_AI_Academy/main.tex](https://github.com/MINDS-edu/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class2/blob/master/6%EA%B8%B0_AI_Academy/main.tex) 
+| |2차시|박해룡|선형회귀 실습|[PYMAIA6_day1_파이썬_실습.ipynb](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%ED%8C%8C%EC%9D%B4%EC%8D%AC_%EC%8B%A4%EC%8A%B5.ipynb)<br>[선형회귀 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80%2C%EB%A1%9C%EC%A7%80%EC%8A%A4%ED%8B%B1%ED%9A%8C%EA%B7%80_ipynb%EC%9D%98_%EC%82%AC%EB%B3%B8.ipynb)|
+| [Day2] 2026.05.16  |1차시|임재형|인공지능 기초수학|[6기-2주차-1교시) 고등수학_예복습_발표자 임재형_260516.pptx](https://github.com/MINDS-edu/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class2/blob/master/6%EA%B8%B0-2%EC%A3%BC%EC%B0%A8-1%EA%B5%90%EC%8B%9C\)%20%EA%B3%A0%EB%93%B1%EC%88%98%ED%95%99_%EC%98%88%EB%B3%B5%EC%8A%B5_%EB%B0%9C%ED%91%9C%EC%9E%90%20%EC%9E%84%EC%9E%AC%ED%98%95_260516.pptx)|
 |   |2차시|임재형|MLP 이론|
 | [Day3] 2026.05.23 |1차시|이지호|CNN 이론|
 |  |2차시|전병연|인공 신경망과 천연 신경망| 
