@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🍄 Super Mario Neural Network Lab</title>
+<style>
+:root {
+  --mario-red:   #E52521;
+  --mario-blue:  #049CD8;
+  --luigi-green: #43B047;
+  --peach-pink:  #F4A6C0;
+  --coin-yellow: #FFD23F;
+  --sky:         #5C94FC;
+  --sky-light:   #A8C8FF;
+  --brick:       #C84C09;
+  --panel:       #FFFFFF;
+  --ink:         #222;
+  --ink-soft:    #555;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(180deg, var(--sky) 0%, var(--sky-light) 60%, #9BE99B 60%, #6BBF59 100%);
+  background-attachment: fixed;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+header {
+  background: var(--mario-red);
+  color: white;
+  padding: 14px 22px;
+  box-shadow: 0 4px 0 #8B0000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+header h1 { margin: 0; font-size: 22px; letter-spacing: 0.5px; }
+header p  { margin: 0; font-size: 13px; opacity: 0.95; }
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 14px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: var(--panel);
+  border: 3px solid #222;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+}
+.panel h2 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  padding: 6px 10px;
+  background: var(--coin-yellow);
+  border-radius: 6px;
+  color: #4a3500;
+  display: inline-block;
+}
+
+#network-panel { grid-column: 1; grid-row: 1; }
+#playground-panel { grid-column: 2; grid-row: 1; }
+#explorer-panel { grid-column: 1 / -1; grid-row: 2; }
+#stats-panel { grid-column: 1 / -1; grid-row: 3; }
+
+/* Network SVG */
+#network-svg { width: 100%; height: 380px; display: block; background: #FAFAFA; border-radius: 6px; }
+.connection { cursor: pointer; transition: stroke-width 0.15s; }
+.connection:hover { stroke-width: 8 !important; }
+.neuron-circle { transition: fill 0.2s; }
+.weight-label { font-size: 11px; font-family: monospace; font-weight: 700; pointer-events: none; }
+.neuron-label { font-size: 13px; font-weight: 700; text-anchor: middle; pointer-events: none; }
+.layer-title  { font-size: 14px; font-weight: 800; text-anchor: middle; fill: #333; }
+.flash { animation: flashPulse 0.6s ease; }
+@keyframes flashPulse {
+  0%   { filter: drop-shadow(0 0 0   var(--coin-yellow)); }
+  50%  { filter: drop-shadow(0 0 18px var(--coin-yellow)); }
+  100% { filter: drop-shadow(0 0 0   var(--coin-yellow)); }
+}
+
+/* Playground */
+#playground {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  background: #fff;
+  border-radius: 6px;
+  border: 2px solid #ddd;
+  cursor: crosshair;
+  touch-action: none;
+}
+.mode-bar, .char-bar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.mode-btn, .char-btn {
+  padding: 7px 12px;
+  border: 2px solid #222;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #f3f3f3;
+  font-size: 13px;
+}
+.mode-btn.active { background: var(--coin-yellow); }
+.char-btn.active { color: white; }
+.char-btn[data-c="0"].active { background: var(--mario-red); }
+.char-btn[data-c="1"].active { background: var(--luigi-green); }
+.char-btn[data-c="2"].active { background: var(--peach-pink); color: #6a2a40; }
+
+.legend { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+
+/* Explorer */
+#computation-content {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+  min-height: 80px;
+}
+#computation-content .step { margin-bottom: 10px; padding: 8px 10px; background: #f7f7fa; border-left: 4px solid var(--mario-blue); border-radius: 4px; }
+#computation-content h3 { margin: 0 0 8px; font-family: inherit; color: var(--mario-blue); }
+#computation-content h4 { margin: 0 0 4px; font-family: inherit; color: var(--brick); }
+#computation-content .math { color: #005f8a; }
+#computation-content .winner { font-size: 15px; padding: 8px; background: var(--coin-yellow); border-radius: 6px; margin-top: 6px; }
+.bar { color: var(--mario-red); letter-spacing: -1px; }
+.empty-note { color: var(--ink-soft); font-style: italic; font-family: inherit; }
+
+/* Stats */
+.stats-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.stat-box {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  background: #f3f3f3;
+  font-family: monospace;
+}
+#loss-chart { width: 260px; height: 70px; background: #fafafa; border: 1px solid #ddd; border-radius: 4px; }
+
+/* Controls */
+footer {
+  position: sticky; bottom: 0;
+  background: #222; color: white;
+  padding: 12px 18px;
+  display: flex; gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 -4px 0 var(--coin-yellow);
+}
+footer label { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+footer input[type=range] { width: 110px; }
+.btn {
+  padding: 9px 16px;
+  border: none; border-radius: 6px;
+  font-weight: 800; font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary   { background: var(--coin-yellow); color: #4a3500; }
+.btn-secondary { background: #555; color: white; }
+.btn-danger    { background: var(--mario-red); color: white; }
+.spacer { flex: 1; }
+#status { font-size: 13px; opacity: 0.95; }
+
+@media (max-width: 860px) {
+  main { grid-template-columns: 1fr; }
+  #network-panel, #playground-panel, #explorer-panel, #stats-panel { grid-column: 1; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🍄 Super Mario Neural Network Lab</h1>
+    <p>Train a tiny "brain" to find where Mario, Luigi and Peach live in the Mushroom Kingdom.</p>
+  </div>
+  <p>2 inputs · 2 hidden neurons · 3 outputs · <b>15 learnable numbers</b></p>
+</header>
+
+<main>
+  <!-- NETWORK -->
+  <section class="panel" id="network-panel">
+    <h2>🧠 The Brain (Neural Network)</h2>
+    <svg id="network-svg" viewBox="0 0 640 380" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend">🟢 line = positive weight &nbsp; 🔴 line = negative weight &nbsp; thick = strong &nbsp; | &nbsp; hover to see value</div>
+  </section>
+
+  <!-- PLAYGROUND -->
+  <section class="panel" id="playground-panel">
+    <h2>🗺️ Mushroom Kingdom Map</h2>
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-edit">✏️ Edit map</button>
+      <button class="mode-btn" id="mode-test">🔍 Test the brain</button>
+    </div>
+    <div class="char-bar" id="char-bar">
+      <button class="char-btn active" data-c="0">🍄 Place Mario</button>
+      <button class="char-btn" data-c="1">💚 Place Luigi</button>
+      <button class="char-btn" data-c="2">👸 Place Peach</button>
+      <button class="char-btn" id="clear-btn" style="margin-left:auto; background:#eee;">🗑️ Clear all</button>
+    </div>
+    <canvas id="playground" width="600" height="600"></canvas>
+    <div class="legend">Drag to move a character · click empty space (in edit) to add · click anywhere in test mode to see the brain decide</div>
+  </section>
+
+  <!-- COMPUTATION EXPLORER -->
+  <section class="panel" id="explorer-panel">
+    <h2>📊 How the Brain Decides (step-by-step math)</h2>
+    <div id="computation-content">
+      <p class="empty-note">Click anywhere on the map in 🔍 Test mode to see every multiplication and addition the brain does.</p>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="panel" id="stats-panel">
+    <h2>📈 Training Progress</h2>
+    <div class="stats-row">
+      <svg id="loss-chart" viewBox="0 0 260 70" preserveAspectRatio="none"></svg>
+      <div class="stat-box">Epoch: <span id="epoch-val">0</span></div>
+      <div class="stat-box">Loss: <span id="loss-val">—</span></div>
+      <div class="stat-box">Accuracy: <span id="acc-val">—</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <button class="btn btn-primary" id="train-btn">⚡ Train!</button>
+  <button class="btn btn-secondary" id="reset-btn">🔄 Reset brain</button>
+  <label>Learning rate
+    <input type="range" id="lr-slider" min="0.01" max="2" step="0.01" value="0.5" />
+    <span id="lr-val">0.50</span>
+  </label>
+  <label>Speed (epochs / frame)
+    <input type="range" id="speed-slider" min="1" max="100" step="1" value="25" />
+    <span id="speed-val">25</span>
+  </label>
+  <div class="spacer"></div>
+  <div id="status">Ready. Place some characters and hit ⚡ Train!</div>
+</footer>
+
+<script>
+/* ==========================================================================
+   SUPER MARIO NEURAL NETWORK LAB
+   A tiny from-scratch MLP: 2 inputs -> 2 hidden (sigmoid) -> 3 outputs (softmax)
+   Trained with online SGD + cross-entropy loss. 15 learnable parameters.
+   ========================================================================== */
+
+/* ---------- small math helpers (vectors / matrices) ---------- */
+const sigmoid  = x => 1 / (1 + Math.exp(-clamp(x, -500, 500)));
+const dsigmoid = s => s * (1 - s);                // derivative given sigmoid OUTPUT
+const clamp    = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function softmax(z) {
+  const m = Math.max(...z);
+  const e = z.map(v => Math.exp(v - m));           // numerical stability
+  const s = e.reduce((a, b) => a + b, 0);
+  return e.map(v => v / s);
+}
+
+const fmt = (v, d = 3) => (v >= 0 ? ' ' : '') + v.toFixed(d);
+
+/* ---------- the neural network ---------- */
+class MLP {
+  constructor() {
+    // Xavier-ish init so the very first forward pass doesn't saturate.
+    this.W1 = randMat(2, 2, 2);   // hidden x input
+    this.b1 = [0, 0];
+    this.W2 = randMat(3, 2, 2);   // output x hidden
+    this.b2 = [0, 0, 0];
+    this.last = null;              // cache for explanation
+  }
+
+  forward(x) {
+    // z1 = W1 x + b1 ; h = sigmoid(z1)
+    const z1 = this.W1.map((row, i) => row.reduce((s, w, j) => s + w * x[j], 0) + this.b1[i]);
+    const h  = z1.map(sigmoid);
+    // z2 = W2 h + b2 ; o = softmax(z2)
+    const z2 = this.W2.map((row, i) => row.reduce((s, w, j) => s + w * h[j], 0) + this.b2[i]);
+    const o  = softmax(z2);
+    this.last = { x, z1, h, z2, o };
+    return this.last;
+  }
+
+  // one step of backprop on a single (input, one-hot-target)
+  trainStep(x, y, lr) {
+    const { h, o } = this.forward(x);
+
+    // cross-entropy loss (for monitoring)
+    const loss = -y.reduce((s, t, i) => s + t * Math.log(Math.max(o[i], 1e-12)), 0);
+
+    // output delta for softmax + cross-entropy is beautifully simple:
+    const d2 = o.map((oi, i) => oi - y[i]);                     // (3,)
+
+    // hidden delta:  d1_j = (sum_i W2_ij * d2_i) * h_j * (1 - h_j)
+    const d1 = h.map((hj, j) => {
+      const s = this.W2.reduce((acc, row, i) => acc + row[j] * d2[i], 0);
+      return s * dsigmoid(hj);
+    });
+
+    // gradient clipping for stability when kids crank up the learning rate
+    const clip = g => clamp(g, -5, 5);
+
+    // update layer 2:  W2[i][j] -= lr * d2[i] * h[j]
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 2; j++) this.W2[i][j] -= lr * clip(d2[i] * h[j]);
+      this.b2[i] -= lr * clip(d2[i]);
+    }
+    // update layer 1:  W1[i][j] -= lr * d1[i] * x[j]
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) this.W1[i][j] -= lr * clip(d1[i] * x[j]);
+      this.b1[i] -= lr * clip(d1[i]);
+    }
+    return loss;
+  }
+}
+
+function randMat(rows, cols, fanIn) {
+  const lim = Math.sqrt(6 / fanIn);
+  return Array.from({ length: rows },
+    () => Array.from({ length: cols }, () => (Math.random() * 2 - 1) * lim));
+}
+
+/* ---------- state ---------- */
+const LABELS   = ['🍄 Mario', '💚 Luigi', '👸 Peach'];
+const COLORS   = ['#E52521', '#43B047', '#F4A6C0'];
+const state = {
+  nn: new MLP(),
+  data: [],                // {x:[x1,x2], y:[0,1,0], c:class}
+  selectedClass: 0,
+  mode: 'edit',            // 'edit' | 'test'
+  isTraining: false,
+  epoch: 0,
+  lossHist: [],
+  lr: 0.5,
+  speed: 25,
+  dragIndex: -1,
+  testPoint: null,
+};
+
+/* ---------- default training data: three neat clusters ---------- */
+function seedData() {
+  state.data = [];
+  const add = (cx, cy, c, n = 5, r = 0.08) => {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * r;
+      const x = clamp(cx + Math.cos(a) * d, 0.02, 0.98);
+      const y = clamp(cy + Math.sin(a) * d, 0.02, 0.98);
+      const target = [0, 0, 0]; target[c] = 1;
+      state.data.push({ x: [x, y], y: target, c });
+    }
+  };
+  add(0.20, 0.22, 0); // Mario (bottom-left)
+  add(0.80, 0.22, 1); // Luigi (bottom-right)
+  add(0.50, 0.82, 2); // Peach (top-center)
+}
+
+/* ==========================================================================
+   RENDERING: NETWORK DIAGRAM (SVG)
+   ========================================================================== */
+const POS = {
+  input:  [[90, 130],  [90, 260]],
+  hidden: [[320, 130], [320, 260]],
+  output: [[555, 80],  [555, 190], [555, 300]],
+};
+const NEURON_FILL = {
+  input:  ['#ffd8d8', '#ffe9b0'],
+  hidden: ['#fff3b0', '#fff3b0'],
+  output: COLORS,
+};
+const NEURON_LABELS = {
+  input:  ['x₁  (left→right)',  'x₂  (low→high)'],
+  hidden: ['h₁', 'h₂'],
+  output: LABELS,
+};
+
+function renderNetwork() {
+  const svg = document.getElementById('network-svg');
+  svg.innerHTML = '';
+  const act = state.nn.last;          // may be null
+
+  // layer titles
+  svgText(svg,  90,  30, 'Inputs',     'layer-title');
+  svgText(svg, 320,  30, 'Hidden',     'layer-title');
+  svgText(svg, 555,  30, 'Outputs',    'layer-title');
+
+  // connections: input -> hidden
+  for (let h = 0; h < 2; h++)
+    for (let i = 0; i < 2; i++)
+      drawConnection(svg, POS.input[i], POS.hidden[h], state.nn.W1[h][i],
+        `W1[${h+1},${i+1}]`);
+  // connections: hidden -> output
+  for (let o = 0; o < 3; o++)
+    for (let h = 0; h < 2; h++)
+      drawConnection(svg, POS.hidden[h], POS.output[o], state.nn.W2[o][h],
+        `W2[${o+1},${h+1}]`, /*dim=*/act ? act.o[o] : null);
+
+  // neurons
+  drawNeuron(svg, POS.input[0],  'input',  0, act ? act.x[0] : null);
+  drawNeuron(svg, POS.input[1],  'input',  1, act ? act.x[1] : null);
+  drawNeuron(svg, POS.hidden[0], 'hidden', 0, act ? act.h[0] : null);
+  drawNeuron(svg, POS.hidden[1], 'hidden', 1, act ? act.h[1] : null);
+  drawNeuron(svg, POS.output[0], 'output', 0, act ? act.o[0] : null);
+  drawNeuron(svg, POS.output[1], 'output', 1, act ? act.o[1] : null);
+  drawNeuron(svg, POS.output[2], 'output', 2, act ? act.o[2] : null);
+
+  // subtitle explaining what hidden neurons often learn
+  svgText(svg, 320, 360,
+    'Each hidden neuron becomes a "detector" — e.g. "is it high up?"',
+    '', '11px', '#888');
+}
+
+function svgText(svg, x, y, text, cls, size, fill) {
+  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  if (cls) t.setAttribute('class', cls);
+  if (size) t.setAttribute('font-size', size);
+  if (fill) t.setAttribute('fill', fill);
+  t.textContent = text;
+  svg.appendChild(t);
+  return t;
+}
+
+function drawConnection(svg, [x1, y1], [x2, y2], w, label) {
+  const positive = w >= 0;
+  const thickness = clamp(1 + Math.abs(w) * 3, 1, 10);
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', positive ? '#43B047' : '#E52521');
+  line.setAttribute('stroke-opacity', clamp(0.35 + Math.abs(w) * 0.5, 0.35, 1));
+  line.setAttribute('stroke-width', thickness);
+  line.setAttribute('class', 'connection');
+  line.addEventListener('mouseenter', e => showTooltip(e, `${label} = ${w.toFixed(3)}`));
+  line.addEventListener('mousemove',  e => moveTooltip(e));
+  line.addEventListener('mouseleave', hideTooltip);
+  svg.appendChild(line);
+
+  // small weight value in middle of line
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bg.setAttribute('x', mx - 18); bg.setAttribute('y', my - 8);
+  bg.setAttribute('width', 36);  bg.setAttribute('height', 14);
+  bg.setAttribute('fill', 'white'); bg.setAttribute('stroke', '#ccc');
+  bg.setAttribute('rx', 3);
+  svg.appendChild(bg);
+  const t = svgText(svg, mx, my + 4, w.toFixed(2), 'weight-label');
+  t.setAttribute('text-anchor', 'middle');
+}
+
+function drawNeuron(svg, [cx, cy], layer, idx, activation) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('class', `neuron ${layer}`);
+
+  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circle.setAttribute('cx', cx); circle.setAttribute('cy', cy);
+  circle.setAttribute('r', 28);
+  let fill = NEURON_FILL[layer][Math.min(idx, NEURON_FILL[layer].length - 1)];
+  if (activation !== null && activation !== undefined && layer !== 'output') {
+    // shade brightness by activation
+    const v = clamp(activation, 0, 1);
+    fill = `rgb(${Math.round(255 - v*60)}, ${Math.round(245 - v*30)}, ${Math.round(180 + v*60)})`;
+  }
+  circle.setAttribute('fill', fill);
+  circle.setAttribute('stroke', '#222');
+  circle.setAttribute('stroke-width', 2);
+  circle.setAttribute('class', 'neuron-circle');
+  g.appendChild(circle);
+
+  // label above
+  svgText(svg, cx, cy - 34, NEURON_LABELS[layer][idx],
+    'neuron-label', '11px', '#222');
+
+  // value inside
+  if (layer === 'output') {
+    const pct = activation === null ? '—' : (activation * 100).toFixed(0) + '%';
+    svgText(svg, cx, cy + 5, pct, 'neuron-label', '14px', '#222');
+  } else {
+    const val = activation === null ? '—' : activation.toFixed(2);
+    svgText(svg, cx, cy + 5, val, 'neuron-label', '13px', '#222');
+  }
+
+  // bias label below
+  const b = layer === 'input' ? null : (layer === 'hidden' ? state.nn.b1[idx] : state.nn.b2[idx]);
+  if (b !== null) svgText(svg, cx, cy + 48, `bias=${b.toFixed(2)}`,
+    'neuron-label', '10px', '#888');
+
+  svg.appendChild(g);
+}
+
+/* tooltip */
+let tooltip = null;
+function showTooltip(e, text) {
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.style.cssText =
+      'position:fixed;background:#222;color:#fff;font-family:monospace;' +
+      'padding:4px 8px;border-radius:4px;pointer-events:none;font-size:12px;' +
+      'z-index:99;white-space:nowrap;';
+    document.body.appendChild(tooltip);
+  }
+  tooltip.textContent = text;
+  tooltip.style.display = 'block';
+  moveTooltip(e);
+}
+function moveTooltip(e) {
+  tooltip.style.left = (e.clientX + 12) + 'px';
+  tooltip.style.top  = (e.clientY + 12) + 'px';
+}
+function hideTooltip() { if (tooltip) tooltip.style.display = 'none'; }
+
+/* ==========================================================================
+   RENDERING: PLAYGROUND (CANVAS)  — map + decision boundary + characters
+   ========================================================================== */
+const canvas = document.getElementById('playground');
+const ctx = canvas.getContext('2d');
+
+function renderPlayground() {
+  const W = canvas.width, H = canvas.height;
+
+  // sky background
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0,   '#A8C8FF');
+  grad.addColorStop(0.9, '#E4EFFF');
+  grad.addColorStop(1,   '#B6E2A0');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // decision boundary (low-res grid sampled through the network)
+  const step = 8;
+  for (let py = 0; py < H; py += step) {
+    for (let px = 0; px < W; px += step) {
+      const x1 = px / W;
+      const x2 = 1 - py / H;                 // y flipped so "high" = top
+      const o  = state.nn.forward([x1, x2]).o;
+      const best = o.indexOf(Math.max(...o));
+      const conf = o[best];
+      ctx.fillStyle = hexToRgba(COLORS[best], 0.12 + conf * 0.45);
+      ctx.fillRect(px, py, step, step);
+    }
+  }
+
+  // grid
+  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 10; i++) {
+    ctx.beginPath(); ctx.moveTo(i * W / 10, 0); ctx.lineTo(i * W / 10, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i * H / 10); ctx.lineTo(W, i * H / 10); ctx.stroke();
+  }
+
+  // axis labels
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillText('← left', 8, H - 8);
+  ctx.fillText('right →', W - 58, H - 8);
+  ctx.fillText('↑ high', 8, 18);
+
+  // training points (characters)
+  state.data.forEach((p, i) => {
+    const px = p.x[0] * W;
+    const py = (1 - p.x[1]) * H;
+    drawCharacter(px, py, p.c, i === state.dragIndex);
+  });
+
+  // test point
+  if (state.testPoint) {
+    const [x1, x2] = state.testPoint;
+    const px = x1 * W, py = (1 - x2) * H;
+    ctx.save();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.arc(px, py, 18, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawCharacter(x, y, c, dragging) {
+  ctx.save();
+  ctx.translate(x, y);
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.beginPath(); ctx.ellipse(0, 14, 14, 5, 0, 0, Math.PI * 2); ctx.fill();
+  // body
+  ctx.fillStyle = COLORS[c];
+  ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = dragging ? '#FFD23F' : '#222';
+  ctx.lineWidth = dragging ? 4 : 2;
+  ctx.stroke();
+  // letter
+  ctx.fillStyle = (c === 2) ? '#6a2a40' : '#fff';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(['M', 'L', 'P'][c], 0, 1);
+  ctx.restore();
+}
+
+function hexToRgba(hex, a) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ==========================================================================
+   RENDERING: COMPUTATION EXPLORER — kid-friendly step-by-step math
+   ========================================================================== */
+function renderComputation() {
+  const box = document.getElementById('computation-content');
+  if (!state.testPoint) {
+    box.innerHTML =
+      '<p class="empty-note">Click anywhere on the map in 🔍 Test mode to see every multiplication and addition the brain does.</p>';
+    return;
+  }
+  const { x, z1, h, z2, o } = state.nn.forward(state.testPoint);
+  const nn = state.nn;
+
+  const html = `
+    <h3>🎯 Testing point: x₁ = ${x[0].toFixed(2)} (left→right) , x₂ = ${x[1].toFixed(2)} (low→high)</h3>
+
+    <div class="step">
+      <h4>① Read the inputs</h4>
+      <div class="math">x₁ = ${x[0].toFixed(3)} &nbsp; x₂ = ${x[1].toFixed(3)}</div>
+    </div>
+
+    <div class="step">
+      <h4>② Hidden neurons combine inputs (weight × input + bias, then squish)</h4>
+      <div class="math">
+        h₁ = σ( ${fmt(nn.W1[0][0],2)} × ${x[0].toFixed(2)} + ${fmt(nn.W1[0][1],2)} × ${x[1].toFixed(2)} + ${fmt(nn.b1[0],2)} )
+           = σ(${fmt(z1[0])}) = <b>${h[0].toFixed(3)}</b><br/>
+        h₂ = σ( ${fmt(nn.W1[1][0],2)} × ${x[0].toFixed(2)} + ${fmt(nn.W1[1][1],2)} × ${x[1].toFixed(2)} + ${fmt(nn.b1[1],2)} )
+           = σ(${fmt(z1[1])}) = <b>${h[1].toFixed(3)}</b>
+      </div>
+      <small style="color:#777">σ (sigmoid) squishes any number into 0…1. Think "how much does this neuron fire?"</small>
+    </div>
+
+    <div class="step">
+      <h4>③ Output neurons vote for each character</h4>
+      <div class="math">
+        z<sub>Mario</sub>  = ${fmt(nn.W2[0][0],2)} × ${h[0].toFixed(2)} + ${fmt(nn.W2[0][1],2)} × ${h[1].toFixed(2)} + ${fmt(nn.b2[0],2)} = ${fmt(z2[0])}<br/>
+        z<sub>Luigi</sub>  = ${fmt(nn.W2[1][0],2)} × ${h[0].toFixed(2)} + ${fmt(nn.W2[1][1],2)} × ${h[1].toFixed(2)} + ${fmt(nn.b2[1],2)} = ${fmt(z2[1])}<br/>
+        z<sub>Peach</sub>  = ${fmt(nn.W2[2][0],2)} × ${h[0].toFixed(2)} + ${fmt(nn.W2[2][1],2)} × ${h[1].toFixed(2)} + ${fmt(nn.b2[2],2)} = ${fmt(z2[2])}
+      </div>
+    </div>
+
+    <div class="step">
+      <h4>④ Softmax turns votes into probabilities (%)</h4>
+      ${LABELS.map((L, i) => {
+        const pct = (o[i] * 100).toFixed(1);
+        const bars = '█'.repeat(Math.max(1, Math.round(o[i] * 30)));
+        return `<div class="math">${L.padEnd(10)} <span class="bar" style="color:${COLORS[i]}">${bars}</span> ${pct}%</div>`;
+      }).join('')}
+    </div>
+
+    <div class="winner">
+      🏆 The brain says: <b>${LABELS[o.indexOf(Math.max(...o))]}</b>
+    </div>`;
+  box.innerHTML = html;
+}
+
+/* ==========================================================================
+   RENDERING: LOSS CHART (SVG)
+   ========================================================================== */
+function renderLossChart() {
+  const svg = document.getElementById('loss-chart');
+  svg.innerHTML = '';
+  const h = state.lossHist;
+  if (h.length < 2) return;
+  const W = 260, H = 70;
+  const maxL = Math.max(...h, 0.1);
+  const pts = h.map((v, i) => {
+    const x = (i / (h.length - 1)) * W;
+    const y = H - (v / maxL) * (H - 6) - 3;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+  poly.setAttribute('points', pts);
+  poly.setAttribute('fill', 'none');
+  poly.setAttribute('stroke', '#E52521');
+  poly.setAttribute('stroke-width', '2');
+  svg.appendChild(poly);
+}
+
+/* ==========================================================================
+   STATS (accuracy + counters)
+   ========================================================================== */
+function computeAccuracy() {
+  if (state.data.length === 0) return null;
+  let correct = 0;
+  for (const p of state.data) {
+    const o = state.nn.forward(p.x).o;
+    if (o.indexOf(Math.max(...o)) === p.c) correct++;
+  }
+  return correct / state.data.length;
+}
+
+function updateStats(loss) {
+  document.getElementById('epoch-val').textContent = state.epoch;
+  document.getElementById('loss-val').textContent  = loss === undefined ? '—' : loss.toFixed(3);
+  const acc = computeAccuracy();
+  document.getElementById('acc-val').textContent = acc === null ? '—' : (acc * 100).toFixed(0) + '%';
+}
+
+/* ==========================================================================
+   TRAINING LOOP
+   ========================================================================== */
+function startTraining() {
+  if (state.data.length === 0) {
+    setStatus('⚠️ Add some characters to the map first!');
+    return;
+  }
+  state.isTraining = true;
+  document.getElementById('train-btn').textContent = '⏸️ Pause';
+  setStatus('🏃 Training... watch the fog on the map take shape!');
+
+  function frame() {
+    if (!state.isTraining) return;
+    let lastLoss = 0;
+    for (let k = 0; k < state.speed; k++) {
+      // online SGD: shuffle & loop
+      let totalLoss = 0;
+      const perm = state.data.map((_, i) => i).sort(() => Math.random() - 0.5);
+      for (const i of perm) {
+        totalLoss += state.nn.trainStep(state.data[i].x, state.data[i].y, state.lr);
+      }
+      lastLoss = totalLoss / state.data.length;
+      state.epoch++;
+    }
+    state.lossHist.push(lastLoss);
+    if (state.lossHist.length > 400) state.lossHist.shift();
+
+    renderNetwork();
+    renderPlayground();
+    renderLossChart();
+    updateStats(lastLoss);
+    if (state.testPoint) renderComputation();
+
+    if (lastLoss < 0.01) {
+      setStatus('🎉 The brain has learned! Try clicking around the map in 🔍 Test mode.');
+      state.isTraining = false;
+      document.getElementById('train-btn').textContent = '⚡ Train!';
+      return;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function stopTraining() {
+  state.isTraining = false;
+  document.getElementById('train-btn').textContent = '⚡ Train!';
+  setStatus('Paused.');
+}
+
+/* ==========================================================================
+   INTERACTION — mouse / touch on the playground
+   ========================================================================== */
+function canvasPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+  const cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+  return {
+    x1: clamp(cx / r.width,  0, 1),
+    x2: clamp(1 - cy / r.height, 0, 1),
+    px: cx, py: cy,
+    W: r.width, H: r.height,
+  };
+}
+function hitIndex(pos) {
+  for (let i = 0; i < state.data.length; i++) {
+    const p = state.data[i];
+    const dx = (p.x[0] - pos.x1) * pos.W;
+    const dy = ((1 - p.x[1]) - (1 - pos.x2)) * pos.H; // same coord system
+    if (Math.hypot(dx, dy) < 18) return i;
+  }
+  return -1;
+}
+
+canvas.addEventListener('mousedown', onDown);
+canvas.addEventListener('mousemove', onMove);
+window.addEventListener ('mouseup',   onUp);
+canvas.addEventListener('touchstart', e => { e.preventDefault(); onDown(e); }, { passive: false });
+canvas.addEventListener('touchmove',  e => { e.preventDefault(); onMove(e); }, { passive: false });
+canvas.addEventListener('touchend',   e => { e.preventDefault(); onUp(e); });
+
+function onDown(e) {
+  const pos = canvasPos(e);
+  if (state.mode === 'test') {
+    state.testPoint = [pos.x1, pos.x2];
+    renderPlayground();
+    renderComputation();
+    renderNetwork();              // shows activations for this point
+    return;
+  }
+  const hit = hitIndex(pos);
+  if (hit >= 0) {
+    state.dragIndex = hit;
+    renderPlayground();
+  } else {
+    // add new character
+    const target = [0, 0, 0]; target[state.selectedClass] = 1;
+    state.data.push({ x: [pos.x1, pos.x2], y: target, c: state.selectedClass });
+    renderPlayground(); updateStats();
+  }
+}
+function onMove(e) {
+  if (state.dragIndex < 0) return;
+  const pos = canvasPos(e);
+  const p = state.data[state.dragIndex];
+  p.x[0] = pos.x1; p.x[1] = pos.x2;
+  renderPlayground();
+}
+function onUp() {
+  if (state.dragIndex >= 0) { state.dragIndex = -1; renderPlayground(); updateStats(); }
+}
+
+/* ==========================================================================
+   UI WIRING
+   ========================================================================== */
+function setStatus(s) { document.getElementById('status').textContent = s; }
+
+document.getElementById('train-btn').addEventListener('click', () => {
+  if (state.isTraining) stopTraining(); else startTraining();
+});
+document.getElementById('reset-btn').addEventListener('click', () => {
+  stopTraining();
+  state.nn = new MLP();
+  state.epoch = 0;
+  state.lossHist = [];
+  state.testPoint = null;
+  renderNetwork(); renderPlayground(); renderComputation(); renderLossChart(); updateStats();
+  setStatus('🧠 Brain reset with new random weights. Ready to learn again!');
+});
+
+document.getElementById('mode-edit').addEventListener('click', () => {
+  state.mode = 'edit';
+  document.getElementById('mode-edit').classList.add('active');
+  document.getElementById('mode-test').classList.remove('active');
+  document.getElementById('char-bar').style.display = 'flex';
+  canvas.style.cursor = 'crosshair';
+});
+document.getElementById('mode-test').addEventListener('click', () => {
+  state.mode = 'test';
+  document.getElementById('mode-test').classList.add('active');
+  document.getElementById('mode-edit').classList.remove('active');
+  document.getElementById('char-bar').style.display = 'none';
+  canvas.style.cursor = 'pointer';
+});
+
+document.querySelectorAll('#char-bar .char-btn[data-c]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.selectedClass = +btn.dataset.c;
+    document.querySelectorAll('#char-bar .char-btn[data-c]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+document.getElementById('clear-btn').addEventListener('click', () => {
+  state.data = [];
+  renderPlayground(); updateStats();
+  setStatus('Map cleared. Place some characters!');
+});
+
+const lrSlider    = document.getElementById('lr-slider');
+const speedSlider = document.getElementById('speed-slider');
+lrSlider   .addEventListener('input', () => {
+  state.lr = +lrSlider.value;
+  document.getElementById('lr-val').textContent = state.lr.toFixed(2);
+});
+speedSlider.addEventListener('input', () => {
+  state.speed = +speedSlider.value;
+  document.getElementById('speed-val').textContent = state.speed;
+});
+
+/* ==========================================================================
+   BOOT
+   ========================================================================== */
+seedData();
+renderNetwork();
+renderPlayground();
+renderComputation();
+renderLossChart();
+updateStats();
+setStatus('Ready. Hit ⚡ Train! and watch the colored fog learn where each character lives.');
+</script>
+</body>
+</html>

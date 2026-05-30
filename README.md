@@ -42,15 +42,27 @@
 
 | 날짜 |차시|강사| 강의 내용 |강의 자료|
 |---|---|---|---|---|
-| [Day1]  2026.05.09 |1차시|염시진|인공지능과 함수|[6기_AI_Academy/main.tex](https://github.com/MINDS-edu/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class2/blob/master/6%EA%B8%B0_AI_Academy/main.tex) 
-| |2차시|박해룡|선형회귀 실습|[PYMAIA6_day1_파이썬_실습.ipynb](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%ED%8C%8C%EC%9D%B4%EC%8D%AC_%EC%8B%A4%EC%8A%B5.ipynb)<br>[선형회귀 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80%2C%EB%A1%9C%EC%A7%80%EC%8A%A4%ED%8B%B1%ED%9A%8C%EA%B7%80_ipynb%EC%9D%98_%EC%82%AC%EB%B3%B8.ipynb)|
-| [Day2] 2026.05.16  |1차시|임재형|인공지능 기초수학|[6기-2주차-1교시) 고등수학_예복습_발표자 임재형_260516.pptx](https://github.com/MINDS-edu/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class2/blob/master/6%EA%B8%B0-2%EC%A3%BC%EC%B0%A8-1%EA%B5%90%EC%8B%9C\)%20%EA%B3%A0%EB%93%B1%EC%88%98%ED%95%99_%EC%98%88%EB%B3%B5%EC%8A%B5_%EB%B0%9C%ED%91%9C%EC%9E%90%20%EC%9E%84%EC%9E%AC%ED%98%95_260516.pptx)|
-|   |2차시|임재형|MLP 이론|
-| [Day3] 2026.05.23 |1차시|이지호|CNN 이론|
-|  |2차시|전병연|인공 신경망과 천연 신경망| 
-|  |3차시|박해룡|인공 신경망을 이용한 손글씨 분류| 
-| [Day4] 2026.05.30|1차시|김병규|LLM 이론|
+| [Day1]  2026.05.09 |1차시|염시진|인공지능과 함수|[6기_AI_Academy/main.tex](https://github.com/MINDS-edu/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class2/blob/master/6%EA%B8%B0_AI_Academy/main.tex)[[pdf]()] 
+| |2차시|박해룡|선형회귀 실습|[PYMAIA6_day1_파이썬_실습.ipynb](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%ED%8C%8C%EC%9D%B4%EC%8D%AC_%EC%8B%A4%EC%8A%B5.ipynb)[[pdf]()]<br>[선형회귀 실습](https://github.com/Potdooshami/2H_TaSe2_Tc_STM/blob/main/PYMAIA6_day1_%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80%2C%EB%A1%9C%EC%A7%80%EC%8A%A4%ED%8B%B1%ED%9A%8C%EA%B7%80_ipynb%EC%9D%98_%EC%82%AC%EB%B3%B8.ipynb)[[pdf]()]|
+| [Day2] 2026.05.16  |1차시|임재형|인공지능 기초수학|[6기-2주차-1교시) 고등수학_예복습_발표자 임재형_260516.pptx](https://github.com/MINDS-edu/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class2/blob/master/6%EA%B8%B0-2%EC%A3%BC%EC%B0%A8-1%EA%B5%90%EC%8B%9C\)%20%EA%B3%A0%EB%93%B1%EC%88%98%ED%95%99_%EC%98%88%EB%B3%B5%EC%8A%B5_%EB%B0%9C%ED%91%9C%EC%9E%90%20%EC%9E%84%EC%9E%AC%ED%98%95_260516.pptx)[[pdf]()]|
+|   |2차시|임재형|로지스틱 회귀 이론|[6기-2주차-2교시\) Regression_발표자 임재형_260516.pptx]()[[pdf]()]|
+|   |3차시|임재형|MLP 이론|[6기-2주차-3교시) MLP_발표자 임재형_260516.pptx]()[[pdf]()]|
+| [Day3] 2026.05.23 |1차시|이지호|CNN 이론|판서|
+|  |2차시|전병연|인공 신경망과 천연 신경망|[present_school.pptx](present_school.pptx) |
+|  |3차시|박해룡|인공 신경망을 이용한 손글씨 분류| [PYMAIA6_day3_CNN_실습.ipynb]()[[pdf]()] <br>[PYMAIA6_day3_LLM찍먹.ipynb]()[[pdf]()]|
+| [Day4] 2026.05.30|1차시|김병규|LLM 이론|[LLM_수업_4주차_김병규.pptx]()[[pdf]()]|
 | |2차시|염시진|AI의 가능성과 한계|x|
+
+## 관련 링크
+[Repository]   
+[6기 1반](https://github.com/HiddenBeginner/The-6th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Class1)  
+[5기](https://github.com/MINDS-edu/The-5th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy)  
+[4기](https://github.com/MINDS-edu/The-4th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Public)  
+[3기](https://github.com/MINDS-edu/The-3rd-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy)  
+[2기](https://github.com/MINDS-edu/2024_teenager_Math_AI_Acadmy)  
+[Padlet]  
+[6기 1반](https://padlet.com/94mostp/6-s8wli6hel40zgivy)  pw: postech  
+[6기 2반](https://padlet.com/jihlee9/6-5kk675i5v8c1611f)  pw: postech
 
 [<img src="https://github.com/MINDS-edu/The-4th-POSTECH-Youth-Mathematical-Artificial-Intelligence-Academy-Public/blob/main/warehouse/1_%ED%8F%AC%ED%95%AD%EC%8B%9CCI_%EA%B8%B0%EB%B3%B8%ED%98%95.jpg" style="height:auto; max-width:100%;">](https://www.pohang.go.kr/main.do)
 [<img src="https://wsrv.nl/?url=https://minds.postech.ac.kr/_res/postech/minds2/img/cropped-logo4-wide-1.png" style="height:auto; max-width:100%;">](https://minds.postech.ac.kr/minds2/index.do)
